@@ -12,58 +12,6 @@ const height = 3000
 var anglesSin [181]float64
 var anglesCos [181]float64
 
-type Surface struct {
-	x1 int
-	y1 int
-	x2 int
-	y2 int
-}
-
-type Ground []Surface
-
-type point interface {
-	X() float64
-	Y() float64
-}
-
-type ShuttleState struct {
-	x        float64
-	y        float64
-	hSpeed   float64
-	vSpeed   float64
-	fuel     float64
-	rotate   int
-	power    int
-	routeInd int
-}
-
-func (state ShuttleState) SetPower(power int) {
-	if power < 0 {
-		state.power = 0
-	} else if power > 4 {
-		state.power = 4
-	} else {
-		state.power = power
-	}
-}
-
-func (state ShuttleState) SetRotate(rotate int) {
-	if rotate < -90 {
-		state.rotate = -90
-	} else if rotate > 90 {
-		state.rotate = 90
-	} else {
-		state.rotate = rotate
-	}
-}
-func (state ShuttleState) X() float64 {
-	return state.x
-}
-
-func (state ShuttleState) Y() float64 {
-	return state.y
-}
-
 func initAngles() {
 	for ind := 0; ind < 181; ind++ {
 		angle := float64(ind-90) / 360 * 2 * math.Pi
@@ -143,5 +91,5 @@ func move(s ShuttleState, time float64) ShuttleState {
 	x := s.x + (hSpeed+s.hSpeed)/2*time
 	y := s.y + (vSpeed+s.vSpeed)/2*time
 	fuel := s.fuel - float64(s.power)*time
-	return ShuttleState{x, y, hSpeed, vSpeed, fuel, s.rotate, s.power, s.routeInd}
+	return ShuttleState{x, y, hSpeed, vSpeed, fuel, s.rotate, s.power}
 }

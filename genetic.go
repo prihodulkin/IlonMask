@@ -5,15 +5,14 @@ import (
 	"math/rand"
 )
 
-const populationCount = 100
+const populationCount = 1000
 const dTime float64 = 1
 const routeCapacity = 50
-const mutationProbability = 00.1
+const mutationProbability = 0.1
 
 type Route []ShuttleState
 
-func generateRoute(s ShuttleState, ground Ground, routeInd int) Route {
-	s.routeInd = routeInd
+func generateRoute(s ShuttleState, ground Ground) Route {
 	result := make(Route, 1, routeCapacity)
 	result[0] = s
 	s = move(s, dTime)
@@ -39,40 +38,28 @@ func generateRoute(s ShuttleState, ground Ground, routeInd int) Route {
 func generateRoutesPopulation(s ShuttleState, ground Ground) []Route {
 	population := make([]Route, populationCount)
 	for i := 0; i < populationCount; i++ {
-		population[i] = generateRoute(s, ground, i)
+		population[i] = generateRoute(s, ground)
 	}
 	return population
 }
 
 func generateNextPopulation(population []Route, ground []Surface) ([]Route, bool) {
 	By(FitnessCmp).Sort(population)
-	bestLastState:=population[0][len(population[0])-1]
-	if isResultWithoutRotate(bestLastState) {
+	bestLastState := population[0][len(population[0])-1]
+	if isResult(bestLastState) {
 		return population, true
 	}
 	c := math.Ceil((-1 + math.Sqrt(1+8*populationCount)) / 2)
 	parentsCount := int(c)
-	result := make([]Route, populationCount)
+	result := make([]Route, 0, populationCount)
+	result = append(result, population[:parentsCount]...)
 	for i := 0; i < parentsCount; i++ {
-		result[i] = population[i]
-	}
-	newLineInd := parentsCount
-	for i := 0; i < parentsCount; i++ {
-		newColInd := 0
 		for j := i + 1; j < parentsCount; j++ {
 			p := rand.Float64()
-			ind := newLineInd + newColInd
-			if ind > len(result)-1 {
-				return result, false
-			}
 			child := crossByPowerAndRotation(population[i], population[j], p, ground)
-			//if child[len(child)-1].x==0{
-			//	print()
-			//}
-			result[newLineInd+newColInd] = child
-			newColInd++
+			result = append(result, child)
 		}
-		newLineInd += parentsCount - i - 1
+
 	}
 	return result, false
 }
@@ -126,11 +113,8 @@ func crossByPowerAndRotation(first Route, second Route, p float64, ground Ground
 	}
 	last := result[len(result)-1]
 	if !isLandedOrCrashed(ground, last.x, last.y) {
-		result = append(result, generateRoute(last, ground, last.routeInd)...)
+		result = append(result, generateRoute(last, ground)...)
 	}
-	//if result[resultLen-1].x==0{
-	//	print()
-	//}
 	return result
 }
 

@@ -64,13 +64,13 @@ func testMovingCase(t *testing.T, res ShuttleState, expected ShuttleState) {
 
 func TestMoving(t *testing.T) {
 	initAngles()
-	s := ShuttleState{100, 100, 0, 0, 100, 0, 4, 0}
+	s := ShuttleState{100, 100, 0, 0, 100, 0, 4}
 	s1 := move(s, 1)
-	expected := ShuttleState{100, 100.1445, 0, 0.289, 96, 0, 4, 0}
+	expected := ShuttleState{100, 100.1445, 0, 0.289, 96, 0, 4}
 	testMovingCase(t, s1, expected)
 
-	s = ShuttleState{200, 100, -5, 10, 100, 30, 3, 0}
+	s = ShuttleState{200, 100, -5, 10, 100, 30, 3}
 	s1 = move(s, 4)
-	expected = ShuttleState{168, 131.096609, -11, 5.548304, 88, 30, 3, 0}
+	expected = ShuttleState{168, 131.096609, -11, 5.548304, 88, 30, 3}
 	testMovingCase(t, s1, expected)
 }

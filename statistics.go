@@ -16,3 +16,7 @@ func printPopulationStatistics(population []Route) {
 	xAvg /= float64(len(population))
 	println("xMin: ", xMin," xMax: ",xMax, " xAvg: ", xAvg)
 }
+
+func printTimeStatistics(attmeptCount int){
+
+}
