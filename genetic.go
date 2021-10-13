@@ -6,9 +6,12 @@ import (
 )
 
 const populationCount = 1000
+const parentsCount = 50
 const dTime float64 = 1
 const routeCapacity = 50
-const mutationProbability = 0.1
+const mutationProbability = 0.02
+const freeStepsCount = 15
+const withVariabilityConstraints = true
 
 type Route []ShuttleState
 
@@ -17,11 +20,11 @@ func generateRoute(s ShuttleState, ground Ground) Route {
 	result[0] = s
 	s = move(s, dTime)
 	result = append(result, s)
-	i := 1
 	moveResult := isLandedOrCrashed(ground, s.x, s.y)
-	for !moveResult && s.x > 0 && s.x <= width && s.y <= height {
+	for i:=1;!moveResult && s.x > 0 && s.x <= width && s.y <= height; i++ {
+		var power int
 		result[i].rotate = generateRandomRotate(result[i-1].rotate)
-		power := generateRandomPower(result[i-1].power)
+		power= generateRandomPower(result[i-1].power)
 		if power <= int(s.fuel) {
 			result[i].power = power
 		} else {
@@ -30,7 +33,34 @@ func generateRoute(s ShuttleState, ground Ground) Route {
 		s = move(result[i], dTime)
 		moveResult = isLandedOrCrashed(ground, s.x, s.y)
 		result = append(result, s)
-		i++
+	}
+	return result
+}
+
+func generateRouteWithVariabilityConstraints(s ShuttleState, ground Ground) Route {
+	result := make(Route, 1, routeCapacity)
+	result[0] = s
+	s = move(s, dTime)
+	result = append(result, s)
+	moveResult := isLandedOrCrashed(ground, s.x, s.y)
+	variabilityCoefficient:=rand.Intn(10)
+	for i:=1;!moveResult && s.x > 0 && s.x <= width && s.y <= height; i++ {
+		var power int
+		if i<freeStepsCount{
+			result[i].rotate = generateRandomRotate(result[i-1].rotate)
+			power= generateRandomPower(result[i-1].power)
+		} else{
+			result[i].rotate = generateRotate(result[i-1].rotate, variabilityCoefficient)
+			power= generatePower(result[i-1].power, variabilityCoefficient)
+		}
+		if power <= int(s.fuel) {
+			result[i].power = power
+		} else {
+			result[i].power = int(s.fuel)
+		}
+		s = move(result[i], dTime)
+		moveResult = isLandedOrCrashed(ground, s.x, s.y)
+		result = append(result, s)
 	}
 	return result
 }
@@ -38,7 +68,11 @@ func generateRoute(s ShuttleState, ground Ground) Route {
 func generateRoutesPopulation(s ShuttleState, ground Ground) []Route {
 	population := make([]Route, populationCount)
 	for i := 0; i < populationCount; i++ {
-		population[i] = generateRoute(s, ground)
+		if withVariabilityConstraints{
+			population[i] = generateRouteWithVariabilityConstraints(s, ground)
+		} else{
+			population[i] = generateRoute(s, ground)
+		}
 	}
 	return population
 }
@@ -49,17 +83,17 @@ func generateNextPopulation(population []Route, ground []Surface) ([]Route, bool
 	if isResult(bestLastState) {
 		return population, true
 	}
-	c := math.Ceil((-1 + math.Sqrt(1+8*populationCount)) / 2)
-	parentsCount := int(c)
-	result := make([]Route, 0, populationCount)
+	//c :=int( math.Ceil((-1 + math.Sqrt(1+8*populationCount)) / 2))
+	result := make([]Route, 0, parentsCount+parentsCount*parentsCount+100)
 	result = append(result, population[:parentsCount]...)
 	for i := 0; i < parentsCount; i++ {
 		for j := i + 1; j < parentsCount; j++ {
 			p := rand.Float64()
 			child := crossByPowerAndRotation(population[i], population[j], p, ground)
 			result = append(result, child)
+			//child = crossByPowerAndRotation(population[i], population[j], 1-p, ground)
+			//result = append(result, child)
 		}
-
 	}
 	return result, false
 }
@@ -113,7 +147,7 @@ func crossByPowerAndRotation(first Route, second Route, p float64, ground Ground
 	}
 	last := result[len(result)-1]
 	if !isLandedOrCrashed(ground, last.x, last.y) {
-		result = append(result, generateRoute(last, ground)...)
+		result = append(result, generateRouteWithVariabilityConstraints(last, ground)...)
 	}
 	return result
 }

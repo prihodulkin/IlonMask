@@ -8,15 +8,15 @@ var xFlatMax float64
 func fitness(route Route) float64 {
 	l := len(route)
 	state := route[l-1]
-	return fitnessState(state) + routeRotateFitness(route[len(route)-7:])
+	return fitnessState(state)// + routeRotateFitness(route[len(route)-10:])
 
 }
 
 func fitnessState(state ShuttleState) float64 {
-	return math.Pow(landingFitness(state.x, xFlatMin, xFlatMax), 2) +
+	return math.Pow(landingFitness(state.x, xFlatMin, xFlatMax),2 ) +
 		math.Pow(vSpeedFitness(state.vSpeed), 2) +
-		math.Pow(hSpeedFitness(state.hSpeed), 2) +
-		math.Abs(float64(state.rotate))
+		math.Pow(hSpeedFitness(state.hSpeed), 2)
+	//+ math.Abs(float64(state.rotate))
 }
 
 func isResultWithoutRotate(state ShuttleState) bool {
@@ -28,7 +28,7 @@ func isResultWithoutRotate(state ShuttleState) bool {
 func isResult(state ShuttleState) bool {
 	return landingFitness(state.x, xFlatMin, xFlatMax)+
 		vSpeedFitness(state.vSpeed)+
-		hSpeedFitness(state.hSpeed)+math.Abs(float64(state.rotate)) == 0
+		hSpeedFitness(state.hSpeed)/*+math.Abs(float64(state.rotate))*/ == 0
 }
 
 func landingFitness(x float64, x1 float64, x2 float64) float64 {
@@ -70,8 +70,8 @@ func rotateFitness(rotate int) float64 {
 
 func routeRotateFitness(route Route) float64 {
 	result := 0.0
-	for _, r := range route {
-		result += rotateFitness(r.rotate)
+	for i, r := range route {
+		result += rotateFitness(r.rotate)*float64(i+1)
 	}
 	return result
 }

@@ -56,7 +56,27 @@ func isLandedOrCrashed(surfaces []Surface, x float64, y float64) bool {
 	return false
 }
 
+func generatePower(power int, variabilityCoefficient int) int {
+	if power < 0 || power > 4 {
+		panic("Incorrect power!")
+	}
+	if rand.Intn(10) > variabilityCoefficient {
+		if power == 4 {
+			return 3
+		} else if power == 0{
+			return 1
+		} else{
+			return power+rand.Intn(2)*2-1
+		}
+	} else{
+		return power
+	}
+}
+
 func generateRandomPower(power int) int {
+	if power < 0 || power > 4 {
+		panic("Incorrect power!")
+	}
 	min := power - 1
 	if min < 0 {
 		min = 0
@@ -69,7 +89,21 @@ func generateRandomPower(power int) int {
 	return min + step
 }
 
+func generateRotate(rotate int, variabilityCoefficient int) int {
+	if rotate < -90 || rotate > 90 {
+		panic("Incorrect rotate!")
+	}
+	if rand.Intn(10) > variabilityCoefficient {
+		return generateRandomRotate(rotate)
+	} else{
+		return rotate
+	}
+}
+
 func generateRandomRotate(rotate int) int {
+	if rotate < -90 || rotate > 90 {
+		panic("Incorrect rotate!")
+	}
 	min := rotate - 15
 	if min < -90 {
 		min = -90
