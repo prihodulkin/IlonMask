@@ -10,8 +10,8 @@ const parentsCount = 100
 const dTime float64 = 1
 const routeCapacity = 50
 const mutationProbability = 0.1
-const freeStepsCount = 15
-const withVariabilityConstraints = false
+var c = 10//чем меньше, тем чаще меняются углы и мощность
+
 
 type Route []ShuttleState
 
@@ -21,15 +21,26 @@ func generateRoute(s ShuttleState, ground Ground) Route {
 	s = move(&s, dTime)
 	result = append(result, s)
 	moveResult := isLandedOrCrashed(ground, s.x, s.y)
-	p:=rand.Intn(10)
+	p:=rand.Int()
+	k:=rand.Intn(3)
 	for i := 1; !moveResult && s.x > 0 && s.x <= width && s.y <= height; i++ {
-		if p%10 == 0 {
-			result[i].rotate = generateRandomRotate(result[i-1].rotate)
-			result[i].power = generateRandomPower(result[i-1].power)
+		if p%c == 0 {
+			//чтоб был больше разброс
+			if k==2{
+				result[i].rotate = generateRandomRotateWithBounds(result[i-1].rotate,0,15)
+				result[i].power = generateRandomPower(result[i-1].power)
+			} else if k==1{
+				result[i].rotate = generateRandomRotateWithBounds(result[i-1].rotate,-15,0)
+				result[i].power = generateRandomPower(result[i-1].power)
+			}else{
+				result[i].rotate = generateRandomRotate(result[i-1].rotate)
+				result[i].power = generateRandomPower(result[i-1].power)
+			}
 		} else{
 			result[i].rotate = result[i-1].rotate
 			result[i].power = result[i-1].power
 		}
+
 		s = move(&result[i], dTime)
 		moveResult = isLandedOrCrashed(ground, s.x, s.y)
 		result = append(result, s)
@@ -37,42 +48,11 @@ func generateRoute(s ShuttleState, ground Ground) Route {
 	return result
 }
 
-func generateRouteWithVariabilityConstraints(s ShuttleState, ground Ground) Route {
-	result := make(Route, 1, routeCapacity)
-	result[0] = s
-	s = move(&s, dTime)
-	result = append(result, s)
-	moveResult := isLandedOrCrashed(ground, s.x, s.y)
-	variabilityCoefficient := rand.Intn(10)
-	for i := 1; !moveResult && s.x > 0 && s.x <= width && s.y <= height; i++ {
-		var power int
-		if i < freeStepsCount {
-			result[i].rotate = generateRandomRotate(result[i-1].rotate)
-			power = generateRandomPower(result[i-1].power)
-		} else {
-			result[i].rotate = generateRotate(result[i-1].rotate, variabilityCoefficient)
-			power = generatePower(result[i-1].power, variabilityCoefficient)
-		}
-		if power*int(dTime) <= int(s.fuel) {
-			result[i].power = power
-		} else {
-			result[i].power = int(s.fuel)
-		}
-		s = move(&result[i], dTime)
-		moveResult = isLandedOrCrashed(ground, s.x, s.y)
-		result = append(result, s)
-	}
-	return result
-}
 
 func generateRoutesPopulation(s ShuttleState, ground Ground) []Route {
 	population := make([]Route, populationCount)
 	for i := 0; i < populationCount; i++ {
-		if withVariabilityConstraints {
-			population[i] = generateRouteWithVariabilityConstraints(s, ground)
-		} else {
-			population[i] = generateRoute(s, ground)
-		}
+		population[i] = generateRoute(s, ground)
 	}
 	return population
 }
@@ -80,19 +60,19 @@ func generateRoutesPopulation(s ShuttleState, ground Ground) []Route {
 func generateNextPopulation(population []Route, ground []Surface) ([]Route, bool) {
 	By(FitnessCmp).Sort(population)
 	bestLastState := population[0][len(population[0])-1]
-	if isResult(bestLastState) {
+	if isResult(bestLastState,population[0][len(population[0])-2].rotate) {
 		return population, true
 	}
 	//c :=int( math.Ceil((-1 + math.Sqrt(1+8*populationCount)) / 2))
-	result := make([]Route, 0, parentsCount+parentsCount*parentsCount+100)
+	result := make([]Route, 0, parentsCount+parentsCount*parentsCount*2+100)
 	result = append(result, population[:parentsCount]...)
 	for i := 0; i < parentsCount; i++ {
 		for j := i + 1; j < parentsCount; j++ {
 			p := rand.Float64()
 			child := crossByPowerAndRotation(population[i], population[j], p, ground)
 			result = append(result, child)
-			//child = crossByPowerAndRotation(population[i], population[j], 1-p, ground)
-			//result = append(result, child)
+			child = crossByPowerAndRotation(population[i], population[j], 1-p, ground)
+			result = append(result, child)
 		}
 	}
 	return result, false
@@ -114,6 +94,7 @@ func Max(a int, b int) int {
 	}
 }
 
+//скрещивание с помощью Continuous Genetic Algorithm
 func crossByPowerAndRotation(first Route, second Route, p float64, ground Ground) Route {
 	l := Min(len(first), len(second))
 	resultLen := Max(len(first), len(second))
@@ -152,6 +133,7 @@ func crossByPowerAndRotation(first Route, second Route, p float64, ground Ground
 	return result
 }
 
+//дозаполнение результата, если хромосома одного из родителей была короче
 func fillTail(source Route, result Route, l int, c int, ground Ground) Route {
 	for i := l - 1; i < len(source)-1; i++ {
 		if rand.Int()%c == 0 {

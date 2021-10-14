@@ -90,6 +90,8 @@ func generateRandomPower(power int) int {
 	return min + step
 }
 
+
+
 func generateRotate(rotate int, variabilityCoefficient int) int {
 	if rotate < -90 || rotate > 90 {
 		panic("Incorrect rotate!")
@@ -115,7 +117,22 @@ func generateRandomRotate(rotate int) int {
 	}
 	step := rand.Intn(max - min + 1)
 	return min + step
+}
 
+func generateRandomRotateWithBounds(rotate int, leftBound int, rightBound int) int {
+	if rotate < -90 || rotate > 90 {
+		panic("Incorrect rotate!")
+	}
+	min := rotate + leftBound
+	if min < -90 {
+		min = -90
+	}
+	max := rotate + rightBound
+	if max > 90 {
+		max = 90
+	}
+	step := rand.Intn(max - min + 1)
+	return min + step
 }
 
 func move(s *ShuttleState, time float64) ShuttleState {
