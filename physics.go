@@ -75,7 +75,8 @@ func generatePower(power int, variabilityCoefficient int) int {
 
 func generateRandomPower(power int) int {
 	if power < 0 || power > 4 {
-		panic("Incorrect power!")
+		print("Incorrect power");
+		//panic("Incorrect power!")
 	}
 	min := power - 1
 	if min < 0 {

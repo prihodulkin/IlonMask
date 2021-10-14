@@ -14,7 +14,7 @@ func main() {
 	//findFlatSurface(ground)
 	//s := input.shuttleState
 	//population := generateRoutesPopulation(s, ground)
-	////printRoutesInSVG(ground, population, "routes/routes0.svg")
+	//printRoutesInSVG(ground, population, "routes/routes.svg")
 	//result := false
 	//for i := 1; !result; i++ {
 	//	population, result = generateNextPopulation(population, ground)
