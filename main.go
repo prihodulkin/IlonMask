@@ -9,7 +9,7 @@ func main() {
 	rand.Seed(time.Now().UnixNano())
 	initAngles()
 	printTimeStatistics(100,"input/input1.txt")
-	//input:=readFromFile("input/input1.txt")
+	//input:=readFromFile("input/input2.txt")
 	//ground:=input.ground
 	//findFlatSurface(ground)
 	//s := input.shuttleState

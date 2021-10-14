@@ -11,26 +11,26 @@ const dTime float64 = 1
 const routeCapacity = 50
 const mutationProbability = 0.1
 const freeStepsCount = 15
-const withVariabilityConstraints = true
+const withVariabilityConstraints = false
 
 type Route []ShuttleState
 
 func generateRoute(s ShuttleState, ground Ground) Route {
 	result := make(Route, 1, routeCapacity)
 	result[0] = s
-	s = move(s, dTime)
+	s = move(&s, dTime)
 	result = append(result, s)
 	moveResult := isLandedOrCrashed(ground, s.x, s.y)
+	p:=rand.Intn(10)
 	for i := 1; !moveResult && s.x > 0 && s.x <= width && s.y <= height; i++ {
-		var power int
-		result[i].rotate = generateRandomRotate(result[i-1].rotate)
-		power = generateRandomPower(result[i-1].power)
-		if power <= int(s.fuel) {
-			result[i].power = power
-		} else {
-			result[i].power = int(s.fuel)
+		if p%10 == 0 {
+			result[i].rotate = generateRandomRotate(result[i-1].rotate)
+			result[i].power = generateRandomPower(result[i-1].power)
+		} else{
+			result[i].rotate = result[i-1].rotate
+			result[i].power = result[i-1].power
 		}
-		s = move(result[i], dTime)
+		s = move(&result[i], dTime)
 		moveResult = isLandedOrCrashed(ground, s.x, s.y)
 		result = append(result, s)
 	}
@@ -40,7 +40,7 @@ func generateRoute(s ShuttleState, ground Ground) Route {
 func generateRouteWithVariabilityConstraints(s ShuttleState, ground Ground) Route {
 	result := make(Route, 1, routeCapacity)
 	result[0] = s
-	s = move(s, dTime)
+	s = move(&s, dTime)
 	result = append(result, s)
 	moveResult := isLandedOrCrashed(ground, s.x, s.y)
 	variabilityCoefficient := rand.Intn(10)
@@ -53,12 +53,12 @@ func generateRouteWithVariabilityConstraints(s ShuttleState, ground Ground) Rout
 			result[i].rotate = generateRotate(result[i-1].rotate, variabilityCoefficient)
 			power = generatePower(result[i-1].power, variabilityCoefficient)
 		}
-		if power <= int(s.fuel) {
+		if power*int(dTime) <= int(s.fuel) {
 			result[i].power = power
 		} else {
 			result[i].power = int(s.fuel)
 		}
-		s = move(result[i], dTime)
+		s = move(&result[i], dTime)
 		moveResult = isLandedOrCrashed(ground, s.x, s.y)
 		result = append(result, s)
 	}
@@ -133,10 +133,7 @@ func crossByPowerAndRotation(first Route, second Route, p float64, ground Ground
 			result[i].SetRotate(result[i-1].rotate + dRotate)
 			result[i].SetPower(result[i-1].rotate + dPower)
 		}
-		if result[i].power > int(result[i].fuel) {
-			result[i].power = int(result[i].fuel)
-		}
-		result[i+1] = move(result[i], dTime)
+		result[i+1] = move(&result[i], dTime)
 		moveResult := isLandedOrCrashed(ground, result[i+1].x, result[i+1].y)
 		if moveResult {
 			result = result[:i+2]
@@ -166,10 +163,7 @@ func fillTail(source Route, result Route, l int, c int, ground Ground) Route {
 			result[i].SetRotate(result[i-1].rotate + dRotate)
 			result[i].SetPower(result[i-1].power + dPower)
 		}
-		if result[i].power > int(result[i].fuel) {
-			result[i].power = int(result[i].fuel)
-		}
-		result[i+1] = move(result[i], dTime)
+		result[i+1] = move(&result[i], dTime)
 		moveResult := isLandedOrCrashed(ground, result[i+1].x, result[i+1].y)
 		if moveResult {
 			result = result[:i+2]

@@ -63,19 +63,19 @@ func generatePower(power int, variabilityCoefficient int) int {
 	if rand.Intn(10) > variabilityCoefficient {
 		if power == 4 {
 			return 3
-		} else if power == 0{
+		} else if power == 0 {
 			return 1
-		} else{
-			return power+rand.Intn(2)*2-1
+		} else {
+			return power + rand.Intn(2)*2 - 1
 		}
-	} else{
+	} else {
 		return power
 	}
 }
 
 func generateRandomPower(power int) int {
 	if power < 0 || power > 4 {
-		print("Incorrect power");
+		print("Incorrect power")
 		//panic("Incorrect power!")
 	}
 	min := power - 1
@@ -96,7 +96,7 @@ func generateRotate(rotate int, variabilityCoefficient int) int {
 	}
 	if rand.Intn(10) > variabilityCoefficient {
 		return generateRandomRotate(rotate)
-	} else{
+	} else {
 		return rotate
 	}
 }
@@ -118,7 +118,10 @@ func generateRandomRotate(rotate int) int {
 
 }
 
-func move(s ShuttleState, time float64) ShuttleState {
+func move(s *ShuttleState, time float64) ShuttleState {
+	if int(s.fuel) < s.power {
+		s.power = int(s.fuel)
+	}
 	vA := float64(s.power)*anglesCos[s.rotate+90] - g
 	hA := -float64(s.power) * anglesSin[s.rotate+90]
 	hSpeed := s.hSpeed + hA*time
