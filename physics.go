@@ -14,7 +14,7 @@ var anglesCos [181]float64
 
 func initAngles() {
 	for ind := 0; ind < 181; ind++ {
-		angle := float64(ind-90) / 360 * 2 * math.Pi
+		angle := float64(ind) / 180 * math.Pi
 		anglesSin[ind] = math.Sin(angle)
 		anglesCos[ind] = math.Cos(angle)
 	}
@@ -90,8 +90,6 @@ func generateRandomPower(power int) int {
 	return min + step
 }
 
-
-
 func generateRotate(rotate int, variabilityCoefficient int) int {
 	if rotate < -90 || rotate > 90 {
 		panic("Incorrect rotate!")
@@ -139,12 +137,13 @@ func move(s *ShuttleState, time float64) ShuttleState {
 	if int(s.fuel) < s.power {
 		s.power = int(s.fuel)
 	}
-	vA := float64(s.power)*anglesCos[s.rotate+90] - g
-	hA := -float64(s.power) * anglesSin[s.rotate+90]
+	vA := float64(s.power)*anglesSin[s.rotate+90] - g
+	hA := float64(s.power) * anglesCos[s.rotate+90]
 	hSpeed := s.hSpeed + hA*time
 	vSpeed := s.vSpeed + vA*time
-	x := s.x + (hSpeed+s.hSpeed)/2*time
-	y := s.y + (vSpeed+s.vSpeed)/2*time
+	// x_1 = x_0 + v_0*t + (a*t^2)/2       https://ru.wikipedia.org/wiki/Равноускоренное_движение
+	x := s.x + hA/2*time*time + s.hSpeed*time
+	y := s.y + vA/2*time*time + s.vSpeed*time
 	fuel := s.fuel - float64(s.power)*time
 	return ShuttleState{x, y, hSpeed, vSpeed, fuel, s.rotate, s.power}
 }
