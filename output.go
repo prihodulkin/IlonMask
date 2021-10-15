@@ -2,19 +2,21 @@ package main
 
 import (
 	"fmt"
-	"github.com/ajstarks/svgo"
+	"io"
 	"log"
 	"math"
 	"os"
+
+	"github.com/ajstarks/svgo"
 )
 
-func (state ShuttleState) printShuttleLanding() {
-	fmt.Printf("x: %f, vSpeed: %f   hSpeed: %f , rotate: %d , fitness:%f \n ",
-		state.x, state.vSpeed, state.hSpeed, state.rotate,  fitnessState(state))
+func (state ShuttleState) String() string {
+	return fmt.Sprintf("x: %f, vSpeed: %f   hSpeed: %f , rotate: %d , fitness:%f \n ",
+		state.x, state.vSpeed, state.hSpeed, state.rotate, fitnessState(state))
 }
 
 func printGround(ground Ground, canvas *svg.SVG) {
-	blackStroke := "stroke=\"black\""
+	blackStroke := `stroke="black"`
 	for _, s := range ground {
 		canvas.Line(s.x1, height-s.y1, s.x2, height-s.y2, blackStroke)
 	}
@@ -43,7 +45,11 @@ func printRoutesInSVG(ground Ground, routes []Route, filePath string) {
 		log.Fatal(err)
 	}
 	defer f.Close()
-	canvas := svg.New(f)
+	WriteRoutesSVG(ground, routes, f)
+}
+
+func WriteRoutesSVG(ground Ground, routes []Route, w io.Writer) {
+	canvas := svg.New(w)
 	canvas.Start(width, height)
 	printGround(ground, canvas)
 	for _, route := range routes {
