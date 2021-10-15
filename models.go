@@ -5,6 +5,9 @@ type Surface struct {
 	y1 int
 	x2 int
 	y2 int
+	A int
+	B int
+	C int
 }
 
 type Ground []Surface

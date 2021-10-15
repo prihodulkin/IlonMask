@@ -10,7 +10,7 @@ const parentsCount = 100
 const dTime float64 = 1
 const routeCapacity = 50
 const mutationProbability = 0.1
-var c = 10//чем меньше, тем чаще меняются углы и мощность
+var c = 1//чем меньше, тем чаще меняются углы и мощность
 
 
 type Route []ShuttleState
@@ -66,13 +66,15 @@ func generateNextPopulation(population []Route, ground []Surface) ([]Route, bool
 	//c :=int( math.Ceil((-1 + math.Sqrt(1+8*populationCount)) / 2))
 	result := make([]Route, 0, parentsCount+parentsCount*parentsCount*2+100)
 	result = append(result, population[:parentsCount]...)
-	for i := 0; i < parentsCount; i++ {
-		for j := i + 1; j < parentsCount; j++ {
-			p := rand.Float64()
-			child := crossByPowerAndRotation(population[i], population[j], p, ground)
-			result = append(result, child)
-			child = crossByPowerAndRotation(population[i], population[j], 1-p, ground)
-			result = append(result, child)
+	for k:=0;k<1;k++{
+		for i := 0; i < parentsCount; i++ {
+			for j := i + 1; j < parentsCount; j++ {
+				p := rand.Float64()
+				child := crossByPowerAndRotation(population[i], population[j], p, ground)
+				result = append(result, child)
+				child = crossByPowerAndRotation(population[i], population[j], 1-p, ground)
+				result = append(result, child)
+			}
 		}
 	}
 	return result, false
