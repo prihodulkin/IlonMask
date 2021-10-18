@@ -1,6 +1,6 @@
 package main
 
-type LandingPositionHeap []ShuttleState
+type LandingPositionHeap []ShuttleData
 
 
 
@@ -12,7 +12,7 @@ func (h LandingPositionHeap) Less(i, j int) bool {
 func (h LandingPositionHeap) Swap(i, j int) { h[i], h[j] = h[j], h[i] }
 
 func (h *LandingPositionHeap) Push(x interface{}) {
-	*h = append(*h, x.(ShuttleState))
+	*h = append(*h, x.(ShuttleData))
 }
 
 func (h *LandingPositionHeap) Pop() interface{} {
@@ -23,7 +23,7 @@ func (h *LandingPositionHeap) Pop() interface{} {
 	return x
 }
 
-type HSpeedHeap []ShuttleState
+type HSpeedHeap []ShuttleData
 
 func (h HSpeedHeap) Len() int { return len(h) }
 
@@ -33,7 +33,7 @@ func (h HSpeedHeap) Less(i, j int) bool {
 func (h HSpeedHeap) Swap(i, j int) { h[i], h[j] = h[j], h[i] }
 
 func (h *HSpeedHeap) Push(x interface{}) {
-	*h = append(*h, x.(ShuttleState))
+	*h = append(*h, x.(ShuttleData))
 }
 
 func (h *HSpeedHeap) Pop() interface{} {
@@ -44,7 +44,7 @@ func (h *HSpeedHeap) Pop() interface{} {
 	return x
 }
 
-type VSpeedHeap []ShuttleState
+type VSpeedHeap []ShuttleData
 
 func (h VSpeedHeap) Len() int { return len(h) }
 
@@ -54,7 +54,7 @@ func (h VSpeedHeap) Less(i, j int) bool {
 func (h VSpeedHeap) Swap(i, j int) { h[i], h[j] = h[j], h[i] }
 
 func (h *VSpeedHeap) Push(x interface{}) {
-	*h = append(*h, x.(ShuttleState))
+	*h = append(*h, x.(ShuttleData))
 }
 
 func (h *VSpeedHeap) Pop() interface{} {

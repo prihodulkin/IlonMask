@@ -17,15 +17,15 @@ func readGround() Ground {
 	for i := 1; i < pointsN; i++ {
 		var x1, y1 int
 		fmt.Scan(&x1, &y1)
-		A, B, C := line(x, y, x1, y1)
-		result[i-1] = Surface{x, y, x1, y1, A, B, C}
+		A, B, C := Line(Point{float64(x), float64(y)}, Point{float64(x1), float64(y1)})
+		result[i-1] = Surface{x, y, x1, y1, int(A), int(B), int(C)}
 		x = x1
 		y = y1
 	}
 	return result
 }
 
-func readShuttleState() ShuttleState {
+func readShuttleState() ShuttleData {
 	var x float64
 	var y float64
 	var hSpeed float64
@@ -34,7 +34,7 @@ func readShuttleState() ShuttleState {
 	var rotate int
 	var power int
 	fmt.Scan(&x, &y, &hSpeed, &vSpeed, &fuel, &rotate, &power)
-	return ShuttleState{x, y, hSpeed, vSpeed, fuel, rotate, power}
+	return ShuttleData{x, y, hSpeed, vSpeed, fuel, rotate, power}
 }
 
 func readFromFile(filePath string) InputData {
@@ -55,8 +55,8 @@ func readFromFile(filePath string) InputData {
 		sarr = strings.Split(fileScanner.Text(), " ")
 		x1, _ = strconv.ParseInt(sarr[0], 10, 32)
 		y1, _ = strconv.ParseInt(sarr[1], 10, 32)
-		A, B, C := line(int(x), int(y), int(x1), int(y1))
-		ground[i-1] = Surface{int(x), int(y), int(x1), int(y1), A, B, C}
+		A, B, C := Line(Point{float64(x), float64(y)}, Point{float64(x1), float64(y1)})
+		ground[i-1] = Surface{int(x), int(y), int(x1), int(y1), int(A), int(B), int(C)}
 		x = x1
 		y = y1
 	}
@@ -69,6 +69,6 @@ func readFromFile(filePath string) InputData {
 	var fuel, _ = strconv.ParseFloat(sarr[4], 64)
 	var rotate, _ = strconv.ParseInt(sarr[5], 10, 64)
 	var power, _ = strconv.ParseInt(sarr[6], 10, 64)
-	state := ShuttleState{x0, y0, hSpeed, vSpeed, fuel, int(rotate), int(power)}
+	state := ShuttleData{x0, y0, hSpeed, vSpeed, fuel, int(rotate), int(power)}
 	return InputData{ground, state}
 }

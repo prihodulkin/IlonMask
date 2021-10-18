@@ -5,42 +5,39 @@ import (
 	"math/rand"
 )
 
-const populationCount = 1000
-const parentsCount = 100
-const dTime float64 = 1
-const routeCapacity = 50
-const mutationProbability = 0.1
-var c = 1//чем меньше, тем чаще меняются углы и мощность
 
 
-type Route []ShuttleState
 
-func generateRoute(s ShuttleState, ground Ground) Route {
+
+type Route []ShuttleData
+
+func generateRoute(s ShuttleData, ground Ground) Route {
 	result := make(Route, 1, routeCapacity)
 	result[0] = s
 	s = move(&s, dTime)
 	result = append(result, s)
 	moveResult := isLandedOrCrashed(ground, s.x, s.y)
-	p:=rand.Int()
-	k:=rand.Intn(3)
+	//p:=rand.Int()
+	//k:=rand.Intn(3)
 	for i := 1; !moveResult && s.x > 0 && s.x <= width && s.y <= height; i++ {
-		if p%c == 0 {
-			//чтоб был больше разброс
-			if k==2{
-				result[i].rotate = generateRandomRotateWithBounds(result[i-1].rotate,0,15)
-				result[i].power = generateRandomPower(result[i-1].power)
-			} else if k==1{
-				result[i].rotate = generateRandomRotateWithBounds(result[i-1].rotate,-15,0)
-				result[i].power = generateRandomPower(result[i-1].power)
-			}else{
-				result[i].rotate = generateRandomRotate(result[i-1].rotate)
-				result[i].power = generateRandomPower(result[i-1].power)
-			}
-		} else{
-			result[i].rotate = result[i-1].rotate
-			result[i].power = result[i-1].power
-		}
-
+		//if p%c == 0 {
+		//	//чтоб был больше разброс
+		//	if k==2{
+		//		result[i].rotate = generateRandomRotateWithBounds(result[i-1].rotate,0,15)
+		//		result[i].power = generateRandomPower(result[i-1].power)
+		//	} else if k==1{
+		//		result[i].rotate = generateRandomRotateWithBounds(result[i-1].rotate,-15,0)
+		//		result[i].power = generateRandomPower(result[i-1].power)
+		//	}else{
+		//		result[i].rotate = generateRandomRotate(result[i-1].rotate)
+		//		result[i].power = generateRandomPower(result[i-1].power)
+		//	}
+		//} else{
+		//	result[i].rotate = result[i-1].rotate
+		//	result[i].power = result[i-1].power
+		//}
+		result[i].rotate = generateRandomRotate(result[i-1].rotate)
+		result[i].power = generateRandomPower(result[i-1].power)
 		s = move(&result[i], dTime)
 		moveResult = isLandedOrCrashed(ground, s.x, s.y)
 		result = append(result, s)
@@ -49,9 +46,9 @@ func generateRoute(s ShuttleState, ground Ground) Route {
 }
 
 
-func generateRoutesPopulation(s ShuttleState, ground Ground) []Route {
-	population := make([]Route, populationCount)
-	for i := 0; i < populationCount; i++ {
+func generateRoutesPopulation(s ShuttleData, ground Ground) []Route {
+	population := make([]Route, populationSize)
+	for i := 0; i < populationSize; i++ {
 		population[i] = generateRoute(s, ground)
 	}
 	return population
@@ -63,20 +60,18 @@ func generateNextPopulation(population []Route, ground []Surface) ([]Route, bool
 	if isResult(bestLastState,population[0][len(population[0])-2].rotate) {
 		return population, true
 	}
-	//c :=int( math.Ceil((-1 + math.Sqrt(1+8*populationCount)) / 2))
-	result := make([]Route, 0, parentsCount+parentsCount*parentsCount*2+100)
-	result = append(result, population[:parentsCount]...)
-	for k:=0;k<1;k++{
-		for i := 0; i < parentsCount; i++ {
-			for j := i + 1; j < parentsCount; j++ {
-				p := rand.Float64()
-				child := crossByPowerAndRotation(population[i], population[j], p, ground)
-				result = append(result, child)
-				child = crossByPowerAndRotation(population[i], population[j], 1-p, ground)
-				result = append(result, child)
-			}
-		}
+	//c :=int( math.Ceil((-1 + math.Sqrt(1+8*populationSize)) / 2))
+	result := make([]Route, 0, populationSize)
+	for i:=0;i<parentsCount;i++{
+		result = append(result, population[i])
 	}
+	for i := 0; i < populationSize-parentsCount; i++ {
+		i1:=int(rand.Float64()*rand.Float64()*rand.Float64()* populationSize /5)
+		p := rand.Float64()
+		child := crossByPowerAndRotation(population[i1%parentsCount], population[i%parentsCount], p, ground)
+		result = append(result, child)
+	}
+
 	return result, false
 }
 

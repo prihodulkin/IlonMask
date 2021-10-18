@@ -14,19 +14,19 @@ func TestLandingPositionHeap(t *testing.T) {
 		{499, 200, 0, 0, 100, 1, 233},
 		{1000, 200, 0, 0, 100, 1, 233}}
 	heap.Init(h)
-	if !almostEqual(heap.Pop(h).(ShuttleState).x, 2000) {
+	if !almostEqual(heap.Pop(h).(ShuttleData).x, 2000) {
 		t.Error()
 	}
-	if !almostEqual(heap.Pop(h).(ShuttleState).x,1000){
+	if !almostEqual(heap.Pop(h).(ShuttleData).x,1000){
 		t.Error()
 	}
-	if !almostEqual(heap.Pop(h).(ShuttleState).x,100){
+	if !almostEqual(heap.Pop(h).(ShuttleData).x,100){
 		t.Error()
 	}
-	if !almostEqual(heap.Pop(h).(ShuttleState).x,499){
+	if !almostEqual(heap.Pop(h).(ShuttleData).x,499){
 		t.Error()
 	}
-	if !almostEqual(heap.Pop(h).(ShuttleState).x,550){
+	if !almostEqual(heap.Pop(h).(ShuttleData).x,550){
 		t.Error()
 	}
 }
@@ -39,19 +39,19 @@ func TestVSpeedPositionHeap(t *testing.T) {
 		{499, 200, 0, -60, 100, 1, 233},
 		{1000, 200, 0, 90, 100, 1, 233}}
 	heap.Init(h)
-	if !almostEqual(heap.Pop(h).(ShuttleState).vSpeed, 90) {
+	if !almostEqual(heap.Pop(h).(ShuttleData).vSpeed, 90) {
 		t.Error()
 	}
-	if !almostEqual(heap.Pop(h).(ShuttleState).vSpeed,-60){
+	if !almostEqual(heap.Pop(h).(ShuttleData).vSpeed,-60){
 		t.Error()
 	}
-	if !almostEqual(heap.Pop(h).(ShuttleState).vSpeed,-45){
+	if !almostEqual(heap.Pop(h).(ShuttleData).vSpeed,-45){
 		t.Error()
 	}
-	if !almostEqual(heap.Pop(h).(ShuttleState).vSpeed,41){
+	if !almostEqual(heap.Pop(h).(ShuttleData).vSpeed,41){
 		t.Error()
 	}
-	if !almostEqual(heap.Pop(h).(ShuttleState).vSpeed,10){
+	if !almostEqual(heap.Pop(h).(ShuttleData).vSpeed,10){
 		t.Error()
 	}
 }

@@ -26,7 +26,7 @@ func printPopulationStatistics(population []Route) {
 func printTimeStatistics(attemptCount int, inputFilePath string) {
 	initAngles()
 	input := readFromFile(inputFilePath)
-	s := input.shuttleState
+	s := input.shuttleData
 	ground := input.ground
 	var minTime = math.MaxInt64
 	var maxTime = math.MinInt64
@@ -63,7 +63,7 @@ func printTimeStatistics(attemptCount int, inputFilePath string) {
 	avgIter /= float64(attemptCount)
 	avgTime /= float64(attemptCount)
 	fmt.Printf("File: %s, attempts count: %d \n", inputFilePath, attemptCount)
-	fmt.Printf("First population's count: %d, mutation probability: %f\n", populationCount, mutationProbability)
+	fmt.Printf("First population's count: %d, mutation probability: %f\n", populationSize, mutationProbability)
 	fmt.Printf("Min iteration count: %d, Max iteration count: %d, Avg iteration count: %f\n", minIter, maxIter, avgIter)
 	fmt.Printf("Min time: %d ms, Max time: %d ms, Avg time: %f ms", minTime, maxTime, avgTime)
 }

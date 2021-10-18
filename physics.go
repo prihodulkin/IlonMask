@@ -20,8 +20,8 @@ func initAngles() {
 	}
 }
 
-//проверяет, x,y соответствуют пересечению поверхности
-func isLandedOrCrashedOnSurface(surface Surface, x float64, y float64) bool {
+//IsUnderground проверяет, x,y соответствуют пересечению поверхности
+func IsUnderground(surface Surface, x float64, y float64) bool {
 	x1 := float64(surface.x1)
 	x2 := float64(surface.x2)
 	y1 := float64(surface.y1)
@@ -51,7 +51,7 @@ func isLandedOrCrashed(surfaces []Surface, x float64, y float64) bool {
 		if x < x1 || x > x2 {
 			continue
 		}
-		return isLandedOrCrashedOnSurface(s, x, y)
+		return IsUnderground(s, x, y)
 	}
 	return false
 }
@@ -133,7 +133,7 @@ func generateRandomRotateWithBounds(rotate int, leftBound int, rightBound int) i
 	return min + step
 }
 
-func move(s *ShuttleState, time float64) ShuttleState {
+func move(s *ShuttleData, time float64) ShuttleData {
 	if int(s.fuel) < s.power {
 		s.power = int(s.fuel)
 	}
@@ -142,8 +142,8 @@ func move(s *ShuttleState, time float64) ShuttleState {
 	hSpeed := s.hSpeed + hA*time
 	vSpeed := s.vSpeed + vA*time
 	// x_1 = x_0 + v_0*t + (a*t^2)/2       https://ru.wikipedia.org/wiki/Равноускоренное_движение
-	x := s.x + hA/2*time*time + s.hSpeed*time
-	y := s.y + vA/2*time*time + s.vSpeed*time
+	x :=  s.x + (hSpeed+s.hSpeed)/2*time
+	y :=s.y + (vSpeed+s.vSpeed)/2*time
 	fuel := s.fuel - float64(s.power)*time
-	return ShuttleState{x, y, hSpeed, vSpeed, fuel, s.rotate, s.power}
+	return ShuttleData{x, y, hSpeed, vSpeed, fuel, s.rotate, s.power}
 }

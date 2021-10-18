@@ -12,7 +12,7 @@ type Surface struct {
 
 type Ground []Surface
 
-type ShuttleState struct {
+type ShuttleData struct {
 	x      float64
 	y      float64
 	hSpeed float64
@@ -23,12 +23,12 @@ type ShuttleState struct {
 }
 
 type InputData struct {
-	ground       Ground
-	shuttleState ShuttleState
+	ground      Ground
+	shuttleData ShuttleData
 }
 
-// TODO Почему тут не указатель?
-func (state ShuttleState) SetPower(power int) {
+
+func (state *ShuttleData) SetPower(power int) {
 	if power < 0 {
 		state.power = 0
 	} else if power > 4 {
@@ -38,7 +38,7 @@ func (state ShuttleState) SetPower(power int) {
 	}
 }
 
-func (state ShuttleState) SetRotate(rotate int) {
+func (state *ShuttleData) SetRotate(rotate int) {
 	if rotate < -90 {
 		state.rotate = -90
 	} else if rotate > 90 {
@@ -48,10 +48,10 @@ func (state ShuttleState) SetRotate(rotate int) {
 	}
 }
 
-func (state ShuttleState) X() float64 {
+func (state ShuttleData) X() float64 {
 	return state.x
 }
 
-func (state ShuttleState) Y() float64 {
+func (state ShuttleData) Y() float64 {
 	return state.y
 }

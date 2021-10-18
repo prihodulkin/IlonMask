@@ -5,32 +5,48 @@ import "math"
 var xFlatMin float64
 var xFlatMax float64
 
+type FitnessData struct {
+	hSpeed       float64
+	vSpeed       float64
+	lastRotation int
+	predRotation int
+	x            float64
+}
+
+func Fitness(data FitnessData) float64 {
+	return math.Pow(landingFitness(data.x, xFlatMin, xFlatMax), 3) +
+		math.Pow(vSpeedFitness(data.vSpeed), 2) +
+		math.Pow(hSpeedFitness(data.hSpeed), 2) +
+		math.Pow(rotateFitness(data.lastRotation) ,1)+
+		math.Pow(rotateFitness(data.predRotation),1)
+}
+
 func fitness(route Route) float64 {
 	l := len(route)
 	state := route[l-1]
-	return fitnessState(state)+rotateFitness(route[l-2].rotate)// + routeRotateFitness(route[len(route)-10:])
+	return fitnessState(state) + rotateFitness(route[l-2].rotate) // + routeRotateFitness(route[len(route)-10:])
 
 }
 
-func fitnessState(state ShuttleState) float64 {
-	return math.Pow(landingFitness(state.x, xFlatMin, xFlatMax), 2) +
-		math.Pow(vSpeedFitness(state.vSpeed),1 ) +
-		math.Pow(hSpeedFitness(state.hSpeed), 1)+
+func fitnessState(state ShuttleData) float64 {
+	return math.Pow(landingFitness(state.x, xFlatMin, xFlatMax), 3) +
+		math.Pow(vSpeedFitness(state.vSpeed), 1) +
+		math.Pow(hSpeedFitness(state.hSpeed), 1) +
 		rotateFitness(state.rotate)
 }
 
-func isResultWithoutRotate(state ShuttleState) bool {
+func isResultWithoutRotate(state ShuttleData) bool {
 	return landingFitness(state.x, xFlatMin, xFlatMax)+
 		vSpeedFitness(state.vSpeed)+
 		hSpeedFitness(state.hSpeed) == 0
 }
 
-func isResult(state ShuttleState, prevRotate int) bool {
+func isResult(state ShuttleData, prevRotate int) bool {
 	return landingFitness(state.x, xFlatMin, xFlatMax)+
 		vSpeedFitness(state.vSpeed)+
 		hSpeedFitness(state.hSpeed)+
 		rotateFitness(state.rotate)+
-		rotateFitness(prevRotate)== 0
+		rotateFitness(prevRotate) == 0
 }
 
 func landingFitness(x float64, x1 float64, x2 float64) float64 {
@@ -73,7 +89,7 @@ func rotateFitness(rotate int) float64 {
 func routeRotateFitness(route Route) float64 {
 	result := 0.0
 	for i, r := range route {
-		result += rotateFitness(r.rotate)*float64(i+1)
+		result += rotateFitness(r.rotate) * float64(i+1)
 	}
 	return result
 }
