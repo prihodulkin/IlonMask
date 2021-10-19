@@ -1,5 +1,37 @@
 package main
 
+import "math"
+
+const g float64 = 3.711
+const width = 7000
+const height = 3000
+
+var anglesSin [181]float64
+var anglesCos [181]float64
+
+func initAngles() {
+	for ind := 0; ind < 181; ind++ {
+		angle := float64(ind) / 180 * math.Pi
+		anglesSin[ind] = math.Sin(angle)
+		anglesCos[ind] = math.Cos(angle)
+	}
+}
+
+func findFlatSurface(ground Ground) {
+	for _, s := range ground {
+		if isFlat(s) {
+			xFlatMin = float64(s.x1)
+			xFlatMax = float64(s.x2)
+			break
+
+		}
+	}
+}
+
+func isFlat(s Surface) bool {
+	return s.y2 == s.y1
+}
+
 type ShuttleState struct {
 	hSpeed float64
 	vSpeed float64
@@ -51,6 +83,7 @@ func Move(state *ShuttleState,  point Point, time int) Point {
 	hSpeed := state.hSpeed + hA*floatTime
 	vSpeed := state.vSpeed + vA*floatTime
 	result := Point{}
+	//формула с использованием новой скорости - меньше арифметических операций =)
 	result.X = point.X + (hSpeed+state.hSpeed)/2*floatTime
 	result.Y = point.Y + (vSpeed+state.vSpeed)/2*floatTime
 	state.hSpeed = hSpeed
@@ -68,14 +101,15 @@ func ApplyChromosome(chromosome Chromosome, shuttleData *ShuttleData, ground Gro
 	path[0] = p1
 	path[1] = p2
 	p, res := IsLandedOrCrashed(ground, p1, p2)
-	i := 1
-	for ; !res && p2.X <= width && p2.X >= 0 && p2.Y <= height; i++ {
+	i := 0
+	for ; !res && p2.X <= width && p2.X >= 0 && p2.Y <= height;  {
 		p1 = p2
-		shuttleState.ChangeRotate(chromosome[i-1].dRotate)
-		shuttleState.ChangePower(chromosome[i-1].dPower)
+		shuttleState.ChangeRotate(chromosome[i].dRotate)
+		shuttleState.ChangePower(chromosome[i].dPower)
 		p2 = Move(&shuttleState, p1, time)
 		path = append(path, p2)
 		p, res = IsLandedOrCrashed(ground, p1, p2)
+		i++
 	}
 	fitnessData := FitnessData{x: p.X,
 		hSpeed:       shuttleState.hSpeed,

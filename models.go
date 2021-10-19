@@ -28,30 +28,3 @@ type InputData struct {
 }
 
 
-func (state *ShuttleData) SetPower(power int) {
-	if power < 0 {
-		state.power = 0
-	} else if power > 4 {
-		state.power = 4
-	} else {
-		state.power = power
-	}
-}
-
-func (state *ShuttleData) SetRotate(rotate int) {
-	if rotate < -90 {
-		state.rotate = -90
-	} else if rotate > 90 {
-		state.rotate = 90
-	} else {
-		state.rotate = rotate
-	}
-}
-
-func (state ShuttleData) X() float64 {
-	return state.x
-}
-
-func (state ShuttleData) Y() float64 {
-	return state.y
-}

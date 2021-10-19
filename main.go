@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"log"
 	"math/rand"
 	"net/http"
@@ -9,39 +10,7 @@ import (
 	"time"
 )
 
-//func printInitialDistributions(filePath string) {
-//	input := readFromFile(filePath)
-//	ground := input.ground
-//	s := input.shuttleData
-//	for i := 1; i < 10; i++ {
-//		population := generateRoutesPopulation(s, ground)
-//		fileName := "populationData/routesDistribution" + strconv.Itoa(i) + ".svg"
-//		printRoutesInSVG(ground, population, fileName)
-//	}
-//}
-//
-//func printLastStates(filePath string){
-//	input:=readFromFile(filePath)
-//	ground:=input.ground
-//	findFlatSurface(ground)
-//	s := input.shuttleData
-//	population := generateRoutesPopulation(s, ground)
-//	printRoutesInSVG(ground, population, "populationData/routes0.svg")
-//	result := false
-//	for i := 1; !result; i++ {
-//		population, result = generateNextPopulation(population, ground)
-//		fmt.Printf("%d ",i)
-//		for i:=0;i<childrenCount;i++{
-//			bestLastState:=population[i][len(population[i])-1]
-//			fmt.Printf(bestLastState.String())
-//		}
-//		//fileName := "populationData/populationData" + strconv.Itoa(i) + ".svg"
-//		//printRoutesInSVG(ground, population, fileName)
-//	}
-//}
-
-
-
+//на каждой итерации выводит в консоль  данные о лучшем пути и отриовывает все пути в файле paths/path{i}.svg
 func printSolution(input InputData) {
 	ground := input.ground
 	findFlatSurface(ground)
@@ -61,7 +30,7 @@ func printSolution(input InputData) {
 	}
 }
 
-
+//выводит в консоль данные о лучшем пути на каждой итерации и рисует результат в paths/solution.svg
 func findSolution(input InputData) {
 	ground := input.ground
 	findFlatSurface(ground)
@@ -79,6 +48,8 @@ func findSolution(input InputData) {
 	}
 	PrintPathInSVG(ground,populationData[0].Path,"paths/solution.svg")
 }
+
+
 //поднимает http сервер localhost:3000, обновляя страницу запускаем новую итерацию
 func httpServeSolution(input InputData) {
 	ground := input.ground
@@ -107,8 +78,15 @@ func httpServeSolution(input InputData) {
 func main() {
 	rand.Seed(time.Now().UnixNano())
 	initAngles()
-	PrintTimeStatistics(100, "input/input5.txt")
+	for i:=1;i<=5;i++{
+		filePath:="input/input"+strconv.Itoa(i)+".txt"
+		PrintTimeStatistics(10, filePath)
+		fmt.Println("\n\n ")
+	}
+	//при желании можно посмотреть по шагам на сервере, вывести путь решения в svg-файл
+	//или вывести в svg-файлы все итерации
 	//input := readFromFile("input/input5.txt")
+	//httpServeSolution(input)
 	//findSolution(input)
 	//printSolution(input)
 }

@@ -5,6 +5,7 @@ import (
 	"math/rand"
 )
 
+//все параметры подобраны методом научного тыка
 const populationSize = 200
 const childrenCount = 100
 const chromosomeSize = 300
@@ -18,7 +19,6 @@ type Gene struct {
 
 type Chromosome []Gene
 
-//type Population []Chromosome
 
 type ChromosomeData struct {
 	Chromosome   Chromosome
@@ -29,7 +29,6 @@ type ChromosomeData struct {
 
 type PopulationData []ChromosomeData
 
-//var population Population
 var populationData PopulationData
 
 func GenerateRandomRotate() int {
@@ -40,22 +39,21 @@ func GenerateRandomPower() int {
 	return -1 + rand.Intn(3)
 }
 
-func GenerateChromosome(data *ShuttleData) Chromosome {
-	result := make(Chromosome, chromosomeSize)
+func GenerateChromosome(data *ShuttleData, ind int)  {
+	populationData[ind].Chromosome = make(Chromosome, chromosomeSize)
+	result:=populationData[ind].Chromosome
 	result[0].dRotate = data.rotate
 	result[0].dPower = data.power
 	for i := 1; i < chromosomeSize; i++ {
 		result[i].dRotate = GenerateRandomRotate()
 		result[i].dPower = GenerateRandomPower()
 	}
-	return result
 }
 
 func GeneratePopulation(data *ShuttleData) {
-	//population = make(Population, populationSize)
 	populationData = make(PopulationData, populationSize)
 	for i := 0; i < populationSize; i++ {
-		populationData[i].Chromosome = GenerateChromosome(data)
+		 GenerateChromosome(data,i)
 	}
 }
 
@@ -77,7 +75,7 @@ func ApplyGenerationMethod1() {
 	for i := 0; i < childrenCount; i++ {
 		i1 := GenerateParentIndex()
 		i2 := GenerateParentIndex()
-		populationData[j].Chromosome = Cross(populationData[i1].Chromosome, populationData[i2].Chromosome)
+		Cross(populationData[i1].Chromosome, populationData[i2].Chromosome, j)
 		j--
 	}
 }
@@ -87,7 +85,7 @@ func ApplyGenerationMethod2() {
 	k := parentsCount
 	for i := 0; i < parentsCount; i++ {
 		for j := i + 1; j < parentsCount; j++ {
-			populationData[k].Chromosome = Cross(populationData[i].Chromosome, populationData[j].Chromosome)
+			Cross(populationData[i].Chromosome, populationData[j].Chromosome,k)
 			k++
 			if k==populationSize{
 				break
@@ -96,9 +94,9 @@ func ApplyGenerationMethod2() {
 	}
 }
 
-//скрещивание с помощью Continuous Genetic Algorithm
-func Cross(first Chromosome, second Chromosome) Chromosome {
-	res := make(Chromosome, chromosomeSize)
+//чтоб не перевыделять память перепичываю поверх существующих плохих хромосом
+func Cross(first Chromosome, second Chromosome, ind int) {
+	res := populationData[ind].Chromosome
 	p := rand.Float64()
 	for i := 0; i < chromosomeSize; i++ {
 		if rand.Float64() < mutationProbability {
@@ -109,5 +107,4 @@ func Cross(first Chromosome, second Chromosome) Chromosome {
 			res[i].dRotate = int(math.Round(p*float64(first[i].dRotate) + (1-p)*float64(second[i].dRotate)))
 		}
 	}
-	return res
 }

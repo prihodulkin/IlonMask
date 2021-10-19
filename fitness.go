@@ -43,19 +43,6 @@ func fitnessState(state ShuttleData) float64 {
 		rotateFitness(state.rotate)
 }
 
-func isResultWithoutRotate(state ShuttleData) bool {
-	return landingFitness(state.x, xFlatMin, xFlatMax)+
-		vSpeedFitness(state.vSpeed)+
-		hSpeedFitness(state.hSpeed) == 0
-}
-
-func isResult(state ShuttleData, prevRotate int) bool {
-	return landingFitness(state.x, xFlatMin, xFlatMax)+
-		vSpeedFitness(state.vSpeed)+
-		hSpeedFitness(state.hSpeed)+
-		rotateFitness(state.rotate)+
-		rotateFitness(prevRotate) == 0
-}
 
 func landingFitness(x float64, x1 float64, x2 float64) float64 {
 	if x < x1 {
