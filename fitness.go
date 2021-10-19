@@ -1,6 +1,9 @@
 package main
 
-import "math"
+import (
+	"fmt"
+	"math"
+)
 
 var xFlatMin float64
 var xFlatMax float64
@@ -17,15 +20,20 @@ func Fitness(data FitnessData) float64 {
 	return math.Pow(landingFitness(data.x, xFlatMin, xFlatMax), 3) +
 		math.Pow(vSpeedFitness(data.vSpeed), 2) +
 		math.Pow(hSpeedFitness(data.hSpeed), 2) +
-		math.Pow(rotateFitness(data.lastRotation) ,1)+
-		math.Pow(rotateFitness(data.predRotation),1)
+		math.Pow(rotateFitness(data.lastRotation), 1) +
+		math.Pow(rotateFitness(data.predRotation), 1)
 }
 
-func fitness(route Route) float64 {
-	l := len(route)
-	state := route[l-1]
-	return fitnessState(state) + rotateFitness(route[l-2].rotate) // + routeRotateFitness(route[len(route)-10:])
+func (data FitnessData) String() string {
+	return fmt.Sprintf("x: %f, vSpeed: %f   hSpeed: %f , "+
+		"pred dRotate: %d, last dRotate: %d , fitness:%f \n ",
+		data.x, data.vSpeed, data.hSpeed, data.predRotation, data.lastRotation, Fitness(data))
+}
 
+func IsSolution(data FitnessData) bool {
+	return landingFitness(data.x, xFlatMin, xFlatMax)+
+		vSpeedFitness(data.vSpeed)+hSpeedFitness(data.hSpeed)+
+		rotateFitness(data.lastRotation)+rotateFitness(data.predRotation) == 0
 }
 
 func fitnessState(state ShuttleData) float64 {
@@ -84,12 +92,4 @@ func rotateFitness(rotate int) float64 {
 	} else {
 		return rotateAbs - 15
 	}
-}
-
-func routeRotateFitness(route Route) float64 {
-	result := 0.0
-	for i, r := range route {
-		result += rotateFitness(r.rotate) * float64(i+1)
-	}
-	return result
 }
