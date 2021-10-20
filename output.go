@@ -2,11 +2,12 @@ package main
 
 import (
 	"fmt"
-	"github.com/ajstarks/svgo"
 	"io"
 	"log"
 	"math"
 	"os"
+
+	"github.com/ajstarks/svgo"
 )
 
 func (state ShuttleData) String() string {
@@ -38,7 +39,7 @@ func PrintPath(path Path, canvas *svg.SVG) {
 	}
 }
 
-func PrintPathsInSVG(ground Ground,  filePath string) {
+func PrintPathsInSVG(ground Ground, filePath string) {
 	f, err := os.Create(filePath)
 	if err != nil {
 		log.Fatal(err)
@@ -47,11 +48,12 @@ func PrintPathsInSVG(ground Ground,  filePath string) {
 	WritePathsSVG(ground, f)
 }
 
-func WritePathsSVG(ground Ground,  w io.Writer) {
+func WritePathsSVG(ground Ground, w io.Writer) {
 	canvas := svg.New(w)
 	canvas.Start(width, height)
 	PrintGround(ground, canvas)
-	for _, data := range populationData {
+	// из-за того что браузер очень тупит при отрисовке больших svg, отрисовываю только самые интересные
+	for _, data := range populationData[:50] {
 		PrintPath(data.Path, canvas)
 	}
 	canvas.End()

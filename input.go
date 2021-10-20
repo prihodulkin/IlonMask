@@ -40,7 +40,10 @@ func readShuttleState() ShuttleData {
 func readFromFile(filePath string) InputData {
 	fileHandle, _ := os.Open(filePath)
 	defer fileHandle.Close()
-	fileScanner := bufio.NewScanner(fileHandle)
+	return readFrom(bufio.NewScanner(fileHandle))
+}
+
+func readFrom(fileScanner *bufio.Scanner) InputData {
 	fileScanner.Scan()
 	var pointsN, _ = strconv.ParseInt(fileScanner.Text(), 10, 32)
 	ground := make(Ground, pointsN-1)
@@ -61,7 +64,13 @@ func readFromFile(filePath string) InputData {
 		y = y1
 	}
 	fileScanner.Scan()
-	sarr = strings.Split(fileScanner.Text(), " ")
+	shuttleState := fileScanner.Text()
+	state := ParseShuttleState(shuttleState)
+	return InputData{ground, state}
+}
+
+func ParseShuttleState(shuttleState string) ShuttleData {
+	sarr := strings.Split(shuttleState, " ")
 	var x0, _ = strconv.ParseFloat(sarr[0], 64)
 	var y0, _ = strconv.ParseFloat(sarr[1], 64)
 	var hSpeed, _ = strconv.ParseFloat(sarr[2], 64)
@@ -70,5 +79,5 @@ func readFromFile(filePath string) InputData {
 	var rotate, _ = strconv.ParseInt(sarr[5], 10, 64)
 	var power, _ = strconv.ParseInt(sarr[6], 10, 64)
 	state := ShuttleData{x0, y0, hSpeed, vSpeed, fuel, int(rotate), int(power)}
-	return InputData{ground, state}
+	return state
 }
